@@ -1,0 +1,22 @@
+{
+  "name": "project-5-products-management-group-17",
+  "version": "1.0.0",
+  "description": "Project - Products Management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satyajitbera/Project-5-Products-Management-Group-17.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/satyajitbera/Project-5-Products-Management-Group-17/issues"
+  },
+  "homepage": "https://github.com/satyajitbera/Project-5-Products-Management-Group-17#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
