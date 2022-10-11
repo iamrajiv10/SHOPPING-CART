@@ -16,7 +16,8 @@ const userModel = new mongoose.Schema({
         unique: true 
     },
     profileImage: {
-        type: String 
+        type: String, 
+        required:true
     }, // s3 link  and , required: true
     phone: { 
         type: String,
