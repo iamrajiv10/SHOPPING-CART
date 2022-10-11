@@ -1,5 +1,6 @@
 const express=require("express")
 const usercontroller=require("../controller/userController")
+const auth=require("../middle/auth")
 
 const router = express.Router();
 
@@ -7,6 +8,7 @@ const router = express.Router();
 router.post("/register", usercontroller.createUser)
 router.post("/login",usercontroller.loginUser)
 router.get("/user/:userId/profile",usercontroller.getById)
+router.put("/user/:userId/profile",auth)
 
 
 router.all("/**", function (req, res) {         
