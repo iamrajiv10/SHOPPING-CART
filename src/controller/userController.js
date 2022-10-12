@@ -16,7 +16,7 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "please provide  details" })
 
         let { fname, lname, email, password, phone, address } = data
-        // console.log(data,typeof(data))
+       
 
 
 
@@ -246,12 +246,19 @@ const updateUser=async function(req,res,){
             }
             address=addressData.address
     }
-    
+    let files = req.files
+    let profileImage
+    if (files && files.length > 0) {
+        uploadedFileURL = await aws.uploadFile(files[0])
+        profileImage = uploadedFileURL
+    }
+ 
 
-    const updateData=await userModel.findByIdAndUpdate(userId,{ fname, lname, email, password, phone,address },{new:true})
+    const updateData=await userModel.findByIdAndUpdate(userId,{ fname, lname, email, password, phone,address,profileImage },{new:true})
     res.status(201).send({status:true,message:"user profile update",data:updateData})
 }
 
 
 module.exports = { createUser, getById, loginUser , updateUser }
+
 
