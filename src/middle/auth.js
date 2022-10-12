@@ -8,7 +8,6 @@ const authentication=function(req,res,next){
     try{
        
         const data=req.header('Authorization')
-        console.log(data)
         if(!data) return res.status(400).send({status:false,messesge:"token must be in header"})
         const token=data.split(" ")[1]
         jwt.verify(token, "veryverysecuresecretkey",

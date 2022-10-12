@@ -5,6 +5,7 @@ const validation = require("../validation/validation")
 const jwt = require("jsonwebtoken")
 const aws = require("./aws")
 const { findByIdAndUpdate } = require("../model/userModel")
+const { json } = require("express")
 
 
 const createUser = async function (req, res) {
@@ -121,14 +122,15 @@ const createUser = async function (req, res) {
 let loginUser = async function (req, res) {
     try {
         let { email, password } = req.body;
-
+        
         if (Object.keys(req.body).length == 0) return res.status(400).send({ status: false, msg: "Request Body Cant Be Empty" });
         if (!email) return res.status(400).send({ status: false, msg: "Please Enter Your Email" });
         if (!password) return res.status(400).send({ status: false, msg: "Please Enter Your Password" });
 
 
         let hash = await userModel.findOne({ email: email }).select({ password: 1 });
-        const result = await new Promise(function (resolve, reject) {
+        if(!hash) return res.status(400).send({status:false,message:"no data with is email or password"})
+                const result = await new Promise(function (resolve, reject) {
             bcrypt.compare(password, hash.password, (err, result) => {
                 console.log(result)
                 return resolve(result)
@@ -175,86 +177,81 @@ const updateUser=async function(req,res,){
     const userId=req.params.userId
     const reqData=req.body
     let { fname, lname, email, password, phone, address } = reqData
-    let toUpdateData={}
+
 
     if(fname){
         if(!validation.isValid(fname)) return res.status(400).send({status:false,message:"fname is not valid"})
-        toUpdateData.fname=fname
     }
     if(lname){
         if(!validation.isValid(lname)) return res.status(400).send({status:false,message:"lname is not valid"})
-        toUpdateData.lname=lname
     }
     if(email){
  if(!validation.isValidEmail(email)) return  res.status(400).send({status:false,message:"email is not valid"})
    const dbEmail=await userModel.findOne({email:email})
    if(dbEmail) return res.status(400).send({status:false,message:"email already used"})
- toUpdateData.email=email
     }
     if(password){
         if(!validation.isValidPassword(password)) return res.status(400).send({status:false,message:"password is not valid"})
-        toUpdateData.password=password
     }
     if(phone){
         if(!validation.isValidNumber(phone)) return res.status(400).send({status:false,message:"phone number is not valid"})
         const dbphone=await userModel.findOne({phone:phone})
    if(dbphone) return res.status(400).send({status:false,message:"phone number already used"})
-        toUpdateData.phone=phone
     }
-//    if(address.shipping.street){
-//        if (!validation.isValid(address.shipping.street)) {
-//         return res.status(400).send({ status: false, message: "street field is required or not valid" })
-//        }
-//        else toUpdateData.address.shipping.stree=address.shipping.stree
-//    }
+    
+    if(address){
+        let addressData=await userModel.findById(userId).select({_id:0,address:1})
+        addressData=addressData.toObject()
+        console.log(addressData)
+         address = JSON.parse(address)
+           
+            if(address.shipping){
+             if(address.shipping.street){
+                if (!validation.isValid(address.shipping.street)) {
+                 return res.status(400).send({ status: false, message: "street field is required or not valid" })
+                }
+                addressData.address.shipping.street=address.shipping.street
+             }
+             if(address.shipping.city){
+                 if (!validation.isValid(address.shipping.city))
+                     return res.status(400).send({ status: false, message: "city field is required or not valid" })
+                addressData.address.shipping.city=address.shipping.city
+             }
+            
+             if(address.shipping.pincode){
+                 if (!validation.isValidPincode(address.shipping.pincode))
+                     return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only " })
+            addressData.address.shipping.pincode=address.shipping.pincode
+             }
+            }
+            
+            if(address.billing){
 
-//    if(address.shipping.city){
-//        if (!validation.isValid(address.shipping.city))
-//            return res.status(400).send({ status: false, message: "city field is required or not valid" })
-//         toUpdateData.address.shipping.city=address.shipping.city
-//    }
-// if(address.shipping.pincode){
-//     if (!validation.isValid(address.shipping.pincode))
-//         return res.status(400).send({ status: false, message: "pincode field is required or not valid" })
-//     toUpdateData.address.shipping.pincode=address.shipping.pincode
-// }
+                if(address.billing.street){
+                    if (!validation.isValid(address.billing.street))
+                        return res.status(400).send({ status: false, message: "street field is required or not valid" })
+                addressData.address.billing.street=address.billing.street
+                }
+                if(address.billing.city){
+                    if (!validation.isValid(address.billing.city))
+                        return res.status(400).send({ status: false, message: "city field is required or not valid" })
+                        addressData.address.billing.city=address.billing.city
+                }
+                
+                if(address.billing.pincode){
+                    if (!validation.isValidPincode(address.billing.pincode))
+                        return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only" })
+                        addressData.address.billing.pincode=address.billing.pincode
+                }
+            }
+            address=addressData.address
+    }
+    
 
-// if(address.shipping.pincode){
-//     if (!validation.isValidPincode(address.shipping.pincode))
-//         return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only " })
-//  toUpdateData.address.shipping.pincode=address.shipping.pincode
-// }
-
-// if(address.billing.street){
-//     if (!validation.isValid(address.billing.street))
-//         return res.status(400).send({ status: false, message: "street field is required or not valid" })
-//  toUpdateData.address.billing.street=address.billing.street
-// }
-
-// if(address.billing.city){
-//     if (!validation.isValid(address.billing.city))
-//         return res.status(400).send({ status: false, message: "city field is required or not valid" })
-//     toUpdateData.address.billing.city=address.billing.city
-// }
-
-// if(address.billing.pincode){
-//     if (!validation.isValid(address.billing.pincode))
-//         return res.status(400).send({ status: false, message: "pincode field is required or not valid" })
-//    toUpdateData.address.billing.pincode=address.billing.pincode
-// }
-
-// if(address.billing.pincode){
-//     if (!validation.isValidPincode(address.billing.pincode))
-//         return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only" })
-//   toUpdateData.address.billing.pincode=address.billing.pincode
-// }
-
-       
- console.log(toUpdateData,userId)
-
-    const updateData=await userModel.findByIdAndUpdate(userId,toUpdateData,{new:true})
+    const updateData=await userModel.findByIdAndUpdate(userId,{ fname, lname, email, password, phone,address },{new:true})
     res.status(201).send({status:true,message:"user profile update",data:updateData})
 }
 
 
 module.exports = { createUser, getById, loginUser , updateUser }
+
