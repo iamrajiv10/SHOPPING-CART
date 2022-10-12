@@ -7,8 +7,9 @@ const router = express.Router();
 
 router.post("/register", usercontroller.createUser)
 router.post("/login",usercontroller.loginUser)
-router.get("/user/:userId/profile",usercontroller.getById)
-router.put("/user/:userId/profile",auth)
+router.get("/user/:userId/profile",auth.authentication, usercontroller.getById)
+// router.put("/user/:userId/profile",usercontroller.updateUser)
+router.put("/user/:userId/profile",auth.authentication,auth.Authorization,usercontroller.updateUser)
 
 
 router.all("/**", function (req, res) {         
