@@ -17,7 +17,7 @@ router.put("/user/:userId/profile",auth.authentication,auth.Authorization,userco
 // product
 
 router.post("/products" ,productcontroller.createProduct)
-
+router.get("/products", productcontroller.getproduct)
 
 router.all("/**", function (req, res) {         
     res.status(400).send({

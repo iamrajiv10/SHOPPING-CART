@@ -1,3 +1,4 @@
+const { get } = require("mongoose");
 const productModel=require("../model/productModel")
 const validation=require("../validation/validation")
 const aws=require("./aws")
@@ -111,4 +112,86 @@ const createProduct = async function(req, res){
     }
 }
 
-module.exports={createProduct}
+
+
+
+//====================================== getAllProduct ========================================
+const getproduct = async function(req, res) {
+    try {
+        let filterQuery = req.query;
+        let { size, name, priceGreaterThan, priceLessThan, priceSort } = filterQuery;
+        
+
+        let query = {}
+        query['isDeleted'] = false;
+
+        // if (size) {
+        //     let array = size.split(",").map(x => x.trim())
+        //     query['availableSizes'] = array
+        // }
+        // if (name) {
+        //     name = name.trim()
+        // }
+
+
+        if (priceGreaterThan) {
+            query['price'] = { $gt: priceGreaterThan }
+        }
+        if (priceLessThan) {
+            query['price'] = { $lt: priceLessThan }
+        }
+        if (priceGreaterThan && priceLessThan) {
+            query['price'] = { '$gt': priceGreaterThan, '$lt': priceLessThan }
+        }
+       
+       // sorting data base on price
+        if (priceSort) {
+            if (priceSort == -1 || priceSort==1) {
+                query['priceSort'] = priceSort
+            } else {
+                return res.status(400).send({ status: false, message: "only enter 1 for accending -1 for desendign" })
+            }
+        }
+
+        let getAllProducts = await productModel.find(query).sort({ price: query.priceSort })
+        if (!Object.keys(getAllProducts).length>0) return res.status(404).send({ status: false, msg: "No products found" })
+        let outData=[]
+        if (size) {
+                let arr= size.split(",").map(x => x.trim())
+                getAllProducts.forEach(e1=>{
+                   let sizeArr=e1.availableSizes
+                    for(let i=0;i<sizeArr.length;i++){
+                        if(size==sizeArr[i])
+                        outData.push(e1)
+                    }
+                })
+            }
+
+       
+        if(!size) outData=[...getAllProducts]
+// filter by name
+     const dataAfterName=[]
+        if(name){
+         outData.forEach((dataForTitle)=>{
+            let title=dataForTitle.title
+            if(title.includes(name)) dataAfterName.push(dataForTitle)
+         })
+        }
+
+if(name) {
+    if(dataAfterName.length==0) return res.status(400).send({status:false,message:"data not found"})
+    outData=dataAfterName
+}
+
+        
+        // success get data and return product
+        return res.status(200).send({ status: true, message:"success", data:outData });
+
+    } catch (err) {
+        console.log(err)
+        return res.status(500).send({ status: false, msg: err.message })
+
+    }
+}
+
+module.exports={createProduct , getproduct}
