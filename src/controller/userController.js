@@ -16,10 +16,7 @@ const createUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "please provide  details" })
 
         let { fname, lname, email, password, phone, address } = data
-       
-
-
-
+      
         if (!validation.isValid(fname))
             return res.status(400).send({ status: false, message: "first name is required or not valid" })
 
@@ -94,18 +91,20 @@ const createUser = async function (req, res) {
 
 
         let files = req.files
-
         if (files && files.length > 0) {
             //upload to s3 and get the uploaded link
             // res.send the link back to frontend/postman
+            
             uploadedFileURL = await aws.uploadFile(files[0])
             data.profileImage = uploadedFileURL
+ 
         }
         else {
             return res.status(400).send({ msg: "No file found" })
         }
         
         let createUser = await userModel.create(data)
+
         return res.status(201).send({ status: true, message: "User created successfully", data: createUser })
     }
     catch (err) {
@@ -174,6 +173,7 @@ let getById = async (req, res) => {
 //============================================ put api =========================================
 
 const updateUser=async function(req,res,){
+    try{
     const userId=req.params.userId
     const reqData=req.body
     let { fname, lname, email, password, phone, address } = reqData
@@ -199,12 +199,15 @@ const updateUser=async function(req,res,){
    if(dbphone) return res.status(400).send({status:false,message:"phone number already used"})
     }
     
+    const userdoc=await userModel.findById(userId)
+    reqData.address=userdoc.address
+
+
+
     if(address){
         let addressData=await userModel.findById(userId).select({_id:0,address:1})
         addressData=addressData.toObject()
         console.log(addressData)
-         address = JSON.parse(address)
-           
             if(address.shipping){
              if(address.shipping.street){
                 if (!validation.isValid(address.shipping.street)) {
@@ -256,6 +259,10 @@ const updateUser=async function(req,res,){
 
     const updateData=await userModel.findByIdAndUpdate(userId,{ fname, lname, email, password, phone,address,profileImage },{new:true})
     res.status(201).send({status:true,message:"user profile update",data:updateData})
+}
+catch(error){
+    return res.status(500).send({status:false,message:error.message})
+}
 }
 
 

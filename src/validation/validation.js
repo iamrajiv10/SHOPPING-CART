@@ -45,4 +45,9 @@ const isValidPassword=function(value){
         return true
 }
 
-module.exports = { isValid, isValidEmail, isValidNumber, isValidRequestBody, isValidObjectId, isValidPincode,isValidPassword }
+const isValidPrice=function(value){
+    let pricePattern=/^[0-9.]{1,15}$/;
+    if(!(pricePattern.test(value))) return false
+    return true
+}
+module.exports = { isValid, isValidEmail, isValidNumber, isValidRequestBody, isValidObjectId, isValidPincode,isValidPassword,isValidPrice }
