@@ -114,7 +114,6 @@ const createProduct = async function(req, res){
 
 
 
-
 //====================================== getAllProduct ========================================
 const getproduct = async function(req, res) {
     try {
@@ -124,15 +123,6 @@ const getproduct = async function(req, res) {
 
         let query = {}
         query['isDeleted'] = false;
-
-        // if (size) {
-        //     let array = size.split(",").map(x => x.trim())
-        //     query['availableSizes'] = array
-        // }
-        // if (name) {
-        //     name = name.trim()
-        // }
-
 
         if (priceGreaterThan) {
             query['price'] = { $gt: priceGreaterThan }
@@ -155,9 +145,11 @@ const getproduct = async function(req, res) {
 
         let getAllProducts = await productModel.find(query).sort({ price: query.priceSort })
         if (!Object.keys(getAllProducts).length>0) return res.status(404).send({ status: false, msg: "No products found" })
+
+
         let outData=[]
         if (size) {
-                let arr= size.split(",").map(x => x.trim())
+                // let arr= size.split(",").map(x => x.trim())
                 getAllProducts.forEach(e1=>{
                    let sizeArr=e1.availableSizes
                     for(let i=0;i<sizeArr.length;i++){
@@ -194,4 +186,57 @@ if(name) {
     }
 }
 
-module.exports={createProduct , getproduct}
+
+
+//================================ GET /products/:productId ==========================================
+
+const getProductList = async (req, res) => {
+    try {
+        let productId = req.params.productId
+
+        if (!validation.isValidObjectId(productId)) { 
+            return res.status(400).send({ status: false, message: "productId  is not valid" }) 
+        }
+
+        let checkbody = await productModel.findOne({ _id: productId });
+
+        if (!checkbody) return res.status(404).send({ status: false, msg: "There is no product exist with this id" });
+
+        if (checkbody.isDeleted == true) return res.status(404).send({ status: false, msg: "Product is already deleted" });
+
+        return res.status(200).send({ status: true, message: 'Product profile details', body: checkbody });
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, msg: err.message });
+    }
+}
+
+
+
+//======================================= delete product ====================================
+
+const deleteProduct = async function (req, res) {
+    try {
+        let productId = req.params.productId
+        if(!validation.isValidObjectId(productId)){
+            return res.status(400).send({status:false, message:"invalid objectid"})
+        }
+        let data = await productModel.findById(productId)
+        if (!data) {
+            return res.status(400).send({ status: false, message: "no product found" })
+        }
+        console.log(data.isDeleted)
+        if (data.isDeleted == true) {
+            return res.status(400).send({ status: false, message: "product already deleted" })
+        }
+        let result = await productModel.updateOne({ _id: productId }, { isDeleted: true,deletedAt:new Date() }, { new: true })
+        return res.status(200).send({ status: true, message: "doccument deleted successfully" })
+
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+
+}
+
+module.exports={createProduct , getproduct,getProductList,deleteProduct}

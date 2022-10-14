@@ -15,7 +15,7 @@ const createUser = async function (req, res) {
         if (!validation.isValidRequestBody(data))
             return res.status(400).send({ status: false, msg: "please provide  details" })
 
-        let { fname, lname, email, password, phone, address } = data
+        let { fname, lname, email, password, phone} = data
       
         if (!validation.isValid(fname))
             return res.status(400).send({ status: false, message: "first name is required or not valid" })
@@ -59,9 +59,8 @@ const createUser = async function (req, res) {
 
         //===========================================ADDRESS==============================================
         // if (!address) return res.status(400).send({ status: false, msg: "address requried" })
-        // address = JSON.parse(address)
-
-        console.log(address.shipping.street, typeof (address.shipping))
+        address = JSON.parse(data.address)
+        data.address=address
         if (!validation.isValid(address.shipping.street))
             return res.status(400).send({ status: false, message: "street field is required or not valid" })
 

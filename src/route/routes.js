@@ -18,6 +18,8 @@ router.put("/user/:userId/profile",auth.authentication,auth.Authorization,userco
 
 router.post("/products" ,productcontroller.createProduct)
 router.get("/products", productcontroller.getproduct)
+router.get("/products/:productId", productcontroller.getProductList)
+router.delete("/products/:productId", productcontroller.deleteProduct)
 
 router.all("/**", function (req, res) {         
     res.status(400).send({
