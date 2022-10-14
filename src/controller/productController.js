@@ -1,5 +1,6 @@
 const { get } = require("mongoose");
-const productModel=require("../model/productModel")
+const productModel=require("../model/productModel");
+const { db } = require("../model/userModel");
 const validation=require("../validation/validation")
 const aws=require("./aws")
 
@@ -63,7 +64,9 @@ const createProduct = async function(req, res){
         if (files && files.length > 0)  uploadedFileURL = await aws.uploadFile(files[0]) 
         else  return res.status(400).send({status:false,message:"productimage is required in file format"})
 
-
+         if(installments) {
+            if(!validation.isValidDigit(installments)) return res.status(400).send({status:false,message:"installment must be in number"})
+         }
 
         //==========================================  structuring the data ================================================ 
 
@@ -211,6 +214,122 @@ const getProductList = async (req, res) => {
     }
 }
 
+// ======================================== update product =======================================
+
+
+const updateProduct = async function (req, res) {
+    try {
+        let productId = req.params.productId
+        let body = req.body
+        const files = req.files
+        if (!validation.isValidObjectId(productId)) return res.status(400).send({ status: false, message: 'productId is not valid' })
+
+        let product = await productModel.findById(productId)
+
+        if (!product) return res.status(404).send({ status: false, messgage: 'product not found' })
+
+        if (product.isDeleted == true) return res.status(400).send({ status: false, messgage: `Product is deleted` })
+
+        // if (!validation.isValid(files)) return res.status(400).send({ status: false, message: "Please Enter data to update the product" })
+
+const data = {}
+// console.log(files)
+if (files.length>0 ) {
+    // if (!validation.isValid(body.productImage)) return res.status(400).send({ status: false, message: "please provide valid product Image" })
+    if (files && files.length > 0)  uploadedFileURL = await aws.uploadFile(files[0]) 
+    else  return res.status(400).send({status:false,message:"productimage is must in file format"})
+}
+
+let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments } = body
+
+if (title) {
+    if (!validation.isValid(title)) return res.status(400).send({ status: false, message: "title must be valid " })
+    if (await productModel.findOne({ title })) return res.status(400).send({ status: false, message: `This title ${title} is already present please Give another Title` })
+  
+    data.title = title
+}
+
+if (description) {
+    if (!validation.isValid(description)) return res.status(400).send({ status: false, message: "description can not be empty" })
+    data.description = description
+}
+
+if (price) {
+    if (!validation.isValid(price)) return res.status(400).send({ status: false, message: "price can not be empty" })
+
+    if (!priceValid.test(price)) return res.status(400).send({ status: false, message: "price should be in  valid Formate with Numbers || Decimals" })
+
+    data.price = price
+}
+
+if (currencyId) {
+    // if (!validation.isValid(currencyId)) return res.status(400).send({ status: false, message: "currencyId can not be empty" })
+    if (currencyId!="INR") return res.status(400).send({ status: false, message: `currencyId Should be in this form 'INR' only` })
+    data.currencyId = currencyId
+}
+
+if (currencyFormat) {
+    // if (!validation.isValid(currencyFormat)) return res.status(400).send({ status: false, message: "currencyFormat can not be empty" })
+    if (currencyFormat!="₹") return res.status(400).send({ status: false, message: `currencyFormat Should be in this form '₹' only` })
+    data.currencyFormat = currencyFormat
+}
+
+if (isFreeShipping) {
+    // if (!validation.isValid(isFreeShipping)) return res.status(400).send({ status: false, message: "isFreeShipping can not be empty" })
+
+    if (!/^(true|false)$/.test(isFreeShipping)) return res.status(400).send({ status: false, message: `isFreeShipping Should be in boolean with small letters` })
+    data.isFreeShipping = isFreeShipping
+}
+
+if (style) {
+    if (!validation.isValid(style)) return res.status(400).send({ status: false, message: "style must be in valid " })
+    data.style = style
+}
+
+if (availableSizes) {
+    if (!validation.isValid(availableSizes)) return res.status(400).send({ status: false, message: "availableSizes must be in valid" })
+    availableSizes = availableSizes.toUpperCase()
+    let size = availableSizes.split(',').map(x => x.trim())
+
+for (let i = 0; i < size.length; i++) {
+    if (!(["S", "XS", "M", "X", "L", "XXL", "XL"].includes(size[i]))) return res.status(400).send({ status: false, message: `availableSizes should have only these Sizes ['S' || 'XS'  || 'M' || 'X' || 'L' || 'XXL' || 'XL']` })
+}
+   const dbSize=product.availableSizes
+   for(let i=0;i<size.length;i++){
+    for(let j=0;j<dbSize.length;j++){
+        if(size[i]==dbSize[j]){
+            dbSize.splice(j,1)
+            size.splice(i,1)
+            i--
+            break
+        }
+    }
+   }
+ const size1=[...size,...dbSize] 
+ data.availableSizes=size1
+
+// data['$addToSet'] = {}
+// data['$addToSet']['availableSizes'] = size1
+}
+
+if(installments) {
+    if(!validation.isValidDigit(installments)) return res.status(400).send({status:false,message:"installment must be in number"})
+    data.installments=installments
+ }
+
+const newProduct = await productModel.findByIdAndUpdate(productId, data, { new: true })
+
+return res.status(200).send({ status: true, message: "Success", data: newProduct })
+
+} catch (error) {
+return res.status(500).send({ error: error.message})
+}
+}
+
+
+
+
+
 
 
 //======================================= delete product ====================================
@@ -239,4 +358,4 @@ const deleteProduct = async function (req, res) {
 
 }
 
-module.exports={createProduct , getproduct,getProductList,deleteProduct}
+module.exports={createProduct , getproduct,getProductList,deleteProduct,updateProduct}

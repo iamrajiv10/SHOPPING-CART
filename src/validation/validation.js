@@ -50,4 +50,9 @@ const isValidPrice=function(value){
     if(!(pricePattern.test(value))) return false
     return true
 }
-module.exports = { isValid, isValidEmail, isValidNumber, isValidRequestBody, isValidObjectId, isValidPincode,isValidPassword,isValidPrice }
+
+const isValidDigit=function(value) {
+    return /^\d+$/.test(value)
+} 
+
+module.exports = { isValid, isValidEmail, isValidNumber, isValidRequestBody, isValidObjectId, isValidPincode,isValidPassword,isValidPrice,isValidDigit }
