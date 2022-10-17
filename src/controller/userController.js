@@ -127,7 +127,7 @@ let loginUser = async function (req, res) {
 
 
         let hash = await userModel.findOne({ email: email }).select({ password: 1 });
-        if(!hash) return res.status(400).send({status:false,message:"no data with is email or password"})
+        if(!hash) return res.status(400).send({status:false,message:"no data with this email or password"})
                 const result = await new Promise(function (resolve, reject) {
             bcrypt.compare(password, hash.password, (err, result) => {
                 console.log(result)
@@ -198,25 +198,26 @@ const updateUser=async function(req,res,){
    if(dbphone) return res.status(400).send({status:false,message:"phone number already used"})
     }
     
-    const userdoc=await userModel.findById(userId)
-    reqData.address=userdoc.address
+    // const userdoc=await userModel.findById(userId)
+    // reqData.address=userdoc.address
 
 
 
     if(address){
         let addressData=await userModel.findById(userId).select({_id:0,address:1})
         addressData=addressData.toObject()
-        console.log(addressData)
+        address = JSON.parse(address)
+        // console.log(addressData)
             if(address.shipping){
              if(address.shipping.street){
                 if (!validation.isValid(address.shipping.street)) {
-                 return res.status(400).send({ status: false, message: "street field is required or not valid" })
+                 return res.status(400).send({ status: false, message: "street field is  not valid" })
                 }
                 addressData.address.shipping.street=address.shipping.street
              }
              if(address.shipping.city){
                  if (!validation.isValid(address.shipping.city))
-                     return res.status(400).send({ status: false, message: "city field is required or not valid" })
+                     return res.status(400).send({ status: false, message: "city field is  not valid" })
                 addressData.address.shipping.city=address.shipping.city
              }
             
@@ -231,12 +232,12 @@ const updateUser=async function(req,res,){
 
                 if(address.billing.street){
                     if (!validation.isValid(address.billing.street))
-                        return res.status(400).send({ status: false, message: "street field is required or not valid" })
+                        return res.status(400).send({ status: false, message: "street field is  not valid" })
                 addressData.address.billing.street=address.billing.street
                 }
                 if(address.billing.city){
                     if (!validation.isValid(address.billing.city))
-                        return res.status(400).send({ status: false, message: "city field is required or not valid" })
+                        return res.status(400).send({ status: false, message: "city field is  not valid" })
                         addressData.address.billing.city=address.billing.city
                 }
                 

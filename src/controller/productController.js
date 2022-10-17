@@ -14,7 +14,7 @@ const createProduct = async function(req, res){
             return res.status(400).send({ status: false, message: 'Invalid params received in request body' })
         }
         if (requestBody.isDeleted && requestBody.isDeleted != "false") {
-            return res.status(400).send({ status: false, message: "Product cannot be deleted while updation" })
+            return res.status(400).send({ status: false, message: "Product cannot be deleted while registor" })
         }
         const { title, description, price, currencyId,currencyFormat,isFreeShipping, style, availableSizes,installments } = requestBody;
 
@@ -85,11 +85,11 @@ const createProduct = async function(req, res){
         }
 
         //================================================= validations for availableSizes=====================================
-        if (!validation.isValid(availableSizes)) {
-            return res.status(400).send({ status: false, message: 'available Sizes is required' })
-        }
-
+        
         if (availableSizes) {
+            if (!validation.isValid(availableSizes)) {
+                return res.status(400).send({ status: false, message: 'available Sizes is required' })
+            }
             let array = availableSizes.split(",").map(x => x.trim())
 
             for (let i = 0; i < array.length; i++) {
