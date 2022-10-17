@@ -5,6 +5,7 @@ const validation = require("../validation/validation")
 
 
 
+// ===================================================== create cart ==============================================
 const createCart = async function (req, res) {
     try {
         let userId = req.params.userId;
@@ -88,4 +89,33 @@ const createCart = async function (req, res) {
     }
 };
 
-module.exports = { createCart }
+
+
+// ========================================================= get cart ===============================================
+
+const getCartData = async function (req, res) {
+    try {
+        let userId = req.params.userId
+
+        if (!validation.isValidObjectId(userId)) return res.status(400).send({ status: false, message: "User Id is not valid" })
+
+        let findUser = await userModel.findById({ _id: userId })
+        if (!findUser) return res.status(404).send({ status: false, message: "User not found" })
+
+        // Authentication
+        let tokenId = req.userId
+    
+        if (tokenId != userId) return res.status(401).send({ status: false, message: "Unauthorised Access" })
+
+        let findCart = await cartModel.findOne({ userId: userId })
+    
+        if (!findCart) return res.status(404).send({ status: false, message: "Cart is not found" })
+
+        return res.status(200).send({ status: true, message: "Cart data fetched successfully", data: findCart })
+
+    }
+    catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
+    }
+}
+module.exports = { createCart , getCartData }
