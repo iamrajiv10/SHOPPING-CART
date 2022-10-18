@@ -15,7 +15,7 @@ const createUser = async function (req, res) {
         if (!validation.isValidRequestBody(data))
             return res.status(400).send({ status: false, msg: "please provide  details" })
 
-        let { fname, lname, email, password, phone} = data
+        let { fname, lname, email, password, phone,address} = data
       
         if (!validation.isValid(fname))
             return res.status(400).send({ status: false, message: "first name is required or not valid" })
@@ -59,31 +59,40 @@ const createUser = async function (req, res) {
 
         //===========================================ADDRESS==============================================
         // if (!address) return res.status(400).send({ status: false, msg: "address requried" })
+        if(!address) return res.status(400).send({status:false,message:"address is required"})
+
         address = JSON.parse(data.address)
-        data.address=address
-        if (!validation.isValid(address.shipping.street))
-            return res.status(400).send({ status: false, message: "street field is required or not valid" })
 
-        if (!validation.isValid(address.shipping.city))
-            return res.status(400).send({ status: false, message: "city field is required or not valid" })
+        if(!address.shipping) return res.status(400).send({status:false,message:"shipping is required"})
+        if(!address.billing) return res.status(400).send({status:false,message:"billing is required"})
 
-        if (!validation.isValid(address.shipping.pincode))
-            return res.status(400).send({ status: false, message: "pincode field is required or not valid" })
+            data.address=address
 
-        if (!validation.isValidPincode(address.shipping.pincode))
-            return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only " })
 
-        if (!validation.isValid(address.billing.street))
-            return res.status(400).send({ status: false, message: "street field is required or not valid" })
-
-        if (!validation.isValid(address.billing.city))
-            return res.status(400).send({ status: false, message: "city field is required or not valid" })
-
-        if (!validation.isValid(address.billing.pincode))
-            return res.status(400).send({ status: false, message: "pincode field is required or not valid" })
-
-        if (!validation.isValidPincode(address.billing.pincode))
-            return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only" })
+            if (!validation.isValid(address.shipping.street))
+                return res.status(400).send({ status: false, message: "street field is required or not valid" })
+    
+            if (!validation.isValid(address.shipping.city))
+                return res.status(400).send({ status: false, message: "city field is required or not valid" })
+    
+            if (!validation.isValid(address.shipping.pincode))
+                return res.status(400).send({ status: false, message: "in shipping pincode field is required or not valid" })
+    
+            if (!validation.isValidPincode(address.shipping.pincode))
+                return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only " })
+    
+            if (!validation.isValid(address.billing.street))
+                return res.status(400).send({ status: false, message: "street field is required or not valid" })
+    
+            if (!validation.isValid(address.billing.city))
+                return res.status(400).send({ status: false, message: "city field is required or not valid" })
+    
+            if (!validation.isValid(address.billing.pincode))
+                return res.status(400).send({ status: false, message: "in billing pincode field is required or not valid" })
+    
+            if (!validation.isValidPincode(address.billing.pincode))
+                return res.status(400).send({ status: false, message: "PIN code should contain 6 digits only" })
+        
 
 
         //=================================================AWS============================================
