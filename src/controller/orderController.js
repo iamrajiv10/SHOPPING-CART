@@ -60,7 +60,7 @@ const createOreder = async function (req, res){
 
         await cartModel.findByIdAndUpdate({_id: cartId}, {$set: {items: [], totalPrice: 0, totalItems: 0}})
 
-        return res.status(201).send({ status: true, message: "Seccess", data: orderDetails })
+        return res.status(201).send({ status: true, message: "Success", data: orderDetails })
     } 
     catch (err) {
         return res.status(500).send({ status: false, message: err.message })
