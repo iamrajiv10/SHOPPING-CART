@@ -107,7 +107,7 @@ const createProduct = async function(req, res){
         //======================================================= creating new product data ==============================
 
         const saveProductDetails = await productModel.create(newProductData)
-        res.status(201).send({ status: true, message: "Product Successfully Created", data: saveProductDetails })
+        res.status(201).send({ status: true, message: "Success", data: saveProductDetails })
 
     } catch (error) {
         console.log(error)
@@ -180,7 +180,7 @@ if(name) {
 
         
         // success get data and return product
-        return res.status(200).send({ status: true, message:"success", data:outData });
+        return res.status(200).send({ status: true, message:"Success", data:outData });
 
     } catch (err) {
         console.log(err)
@@ -207,7 +207,7 @@ const getProductList = async (req, res) => {
 
         if (checkbody.isDeleted == true) return res.status(404).send({ status: false, msg: "Product is already deleted" });
 
-        return res.status(200).send({ status: true, message: 'Product profile details', body: checkbody });
+        return res.status(200).send({ status: true, message:'Success', data: checkbody });
     }
     catch (err) {
         return res.status(500).send({ status: false, msg: err.message });
@@ -257,7 +257,7 @@ if (description) {
 if (price) {
     if (!validation.isValid(price)) return res.status(400).send({ status: false, message: "price can not be empty" })
 
-    if (!priceValid.test(price)) return res.status(400).send({ status: false, message: "price should be in  valid Formate with Numbers || Decimals" })
+    if (!validation.isValidPrice(price)) return res.status(400).send({ status: false, message: "price should be in  valid Formate with Numbers || Decimals" })
 
     data.price = price
 }

@@ -267,7 +267,7 @@ const updateUser=async function(req,res,){
  
 
     const updateData=await userModel.findByIdAndUpdate(userId,{ fname, lname, email, password, phone,address,profileImage },{new:true})
-    res.status(201).send({status:true,message:"user profile update",data:updateData})
+    res.status(200).send({status:true,message:"user profile update",data:updateData})
 }
 catch(error){
     return res.status(500).send({status:false,message:error.message})

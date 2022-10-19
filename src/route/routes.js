@@ -2,6 +2,7 @@ const express=require("express")
 const usercontroller=require("../controller/userController")
 const productcontroller=require("../controller/productController")
 const cartcontroller=require("../controller/cartController")
+const orderController=require("../controller/orderController")
 const auth=require("../middle/auth")
 
 const router = express.Router();
@@ -31,6 +32,12 @@ router.post("/users/:userId/cart",auth.authentication,auth.Authorization,cartcon
 router.put("/users/:userId/cart",auth.authentication,auth.Authorization,cartcontroller.updateCart)
 router.get("/users/:userId/cart",auth.authentication,auth.Authorization,cartcontroller.getCartData)
 router.delete("/users/:userId/cart",auth.authentication,auth.Authorization,cartcontroller.deleteCartProducts)
+
+
+
+// order
+
+router.post("/users/:userId/orders",auth.authentication,auth.Authorization,orderController.createOreder)
 
 router.all("/**", function (req, res) {         
     res.status(400).send({
