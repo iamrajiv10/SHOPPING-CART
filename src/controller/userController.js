@@ -17,10 +17,10 @@ const createUser = async function (req, res) {
 
         let { fname, lname, email, password, phone,address} = data
       
-        if (!validation.isValid(fname))
+        if (!validation.isString(fname))
             return res.status(400).send({ status: false, message: "first name is required or not valid" })
 
-        if (!validation.isValid(lname))
+        if (!validation.isString(lname))
             return res.status(400).send({ status: false, message: "last name is required or not valid" })
 
 

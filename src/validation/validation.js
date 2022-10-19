@@ -9,8 +9,15 @@ const isValid = function (value) {
     return true;
 };
 
+
 const isValidNumber = function (value) {
     const noNumber = /^(\+91[\-\s]?)?[0]?(91)?[6-9]\d{9}$/g
+    if (typeof value !== 'string') return false
+    if (noNumber.test(value) === false) return false
+    return true
+}
+const isString = function (value) {
+    const noNumber = /^[a-zA-Z]{2,20}$/
     if (typeof value !== 'string') return false
     if (noNumber.test(value) === false) return false
     return true
@@ -55,4 +62,4 @@ const isValidDigit=function(value) {
     return /^\d+$/.test(value)
 } 
 
-module.exports = { isValid, isValidEmail, isValidNumber, isValidRequestBody, isValidObjectId, isValidPincode,isValidPassword,isValidPrice,isValidDigit }
+module.exports = {isString, isValid, isValidEmail, isValidNumber, isValidRequestBody, isValidObjectId, isValidPincode,isValidPassword,isValidPrice,isValidDigit }
