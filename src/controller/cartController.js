@@ -152,8 +152,8 @@ const updateCart = async function (req, res) {
                         {
                             $pull: { items: { productId: productId } },
                             $set: {
-                                totalPrice: 0,
-                                totalItems: 0
+                                totalPrice: productIdInCart.totalPrice-items[i].quantity*productInDB.price,
+                                totalItems: items.length-1
                             }
                         },
                         { new: true })
