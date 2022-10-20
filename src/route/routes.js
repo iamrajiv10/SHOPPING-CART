@@ -38,6 +38,7 @@ router.delete("/users/:userId/cart",auth.authentication,auth.Authorization,cartc
 // order
 
 router.post("/users/:userId/orders",auth.authentication,auth.Authorization,orderController.createOreder)
+router.put("/users/:userId/orders",auth.authentication,auth.Authorization,orderController.updateOrder)
 
 router.all("/**", function (req, res) {         
     res.status(400).send({

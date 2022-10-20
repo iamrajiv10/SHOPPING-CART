@@ -1,3 +1,4 @@
+
 const cartModel = require('../model/cartModel');
 const productModel = require('../model/productModel');
 const userModel = require('../model/userModel');
@@ -100,9 +101,9 @@ const updateCart = async function (req, res) {
         let { productId, cartId, removeProduct } = req.body
 
 
-        productId = productId.toString().trim()
-        cartId = cartId.toString().trim()
-        removeProduct = removeProduct.toString().trim()
+        productId = productId.trim()
+        cartId = cartId.trim()
+        removeProduct = removeProduct.trim() 
 
         if (!validation.isValidObjectId(userId)) {
             return res.status(400).send({ status: false, message: "userId must be required and should be valid" })

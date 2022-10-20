@@ -11,11 +11,12 @@ const { json } = require("express")
 const createUser = async function (req, res) {
     try {
         let data = req.body
-        console.log(data)
+        console.log(req.files)
         if (!validation.isValidRequestBody(data))
             return res.status(400).send({ status: false, msg: "please provide  details" })
 
         let { fname, lname, email, password, phone,address} = data
+        
       
         if (!validation.isString(fname))
             return res.status(400).send({ status: false, message: "first name is required or not valid" })
@@ -97,11 +98,12 @@ const createUser = async function (req, res) {
 
         //=================================================AWS============================================
 
-
+        
         let files = req.files
         if (files && files.length > 0) {
             //upload to s3 and get the uploaded link
             // res.send the link back to frontend/postman
+            if (files[0].fieldname!="profileImage") return res.status(400).send({ status: false, message: "profileImage is required or not valid" })
             
             uploadedFileURL = await aws.uploadFile(files[0])
             data.profileImage = uploadedFileURL
