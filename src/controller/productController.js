@@ -104,7 +104,7 @@ const createProduct = async function(req, res){
             }
         }
 
-        //======================================================= creating new product data ==============================
+        //=================================================== creating new product data =====================================
 
         const saveProductDetails = await productModel.create(newProductData)
         res.status(201).send({ status: true, message: "Success", data: saveProductDetails })
